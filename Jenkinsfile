@@ -1,6 +1,16 @@
 pipeline {
   agent any
 
+  // ✅ ESTO ES LO QUE FALTABA - Habilita el trigger automático
+  triggers {
+    githubPush()
+  }
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '10'))
+    timestamps()
+  }
+
   stages {
     stage('Cleanup') {
       steps {
