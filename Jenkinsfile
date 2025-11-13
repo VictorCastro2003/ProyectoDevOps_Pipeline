@@ -10,13 +10,13 @@ pipeline {
 
     stage('Install') {
       steps {
-        sh 'npm ci'
+        bat 'npm ci'
       }
     }
 
     stage('Run Tests (Jest -> JUnit)') {
       steps {
-        sh 'npm run test:junit'
+        bat 'npm run test:junit'
       }
       post {
         always {
@@ -27,7 +27,7 @@ pipeline {
 
     stage('Lint (ESLint)') {
       steps {
-        sh 'mkdir -p reports || true; npm run lint > reports/eslint.log || true'
+        bat 'mkdir -p reports || true; npm run lint > reports/eslint.log || true'
         archiveArtifacts artifacts: 'reports/eslint.log', fingerprint: true
       }
     }
@@ -35,7 +35,7 @@ pipeline {
     stage('Archive DB (optional)') {
       steps {
         // Archive the sqlite DB so evaluator can see it (only for demo)
-        sh 'if [ -f db/users.db ]; then mkdir -p reports/db && cp db/users.db reports/db/; fi'
+        bat 'if [ -f db/users.db ]; then mkdir -p reports/db && cp db/users.db reports/db/; fi'
         archiveArtifacts artifacts: 'reports/db/**', fingerprint: true
       }
     }
