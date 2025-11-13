@@ -4,9 +4,10 @@ pipeline {
   stages {
     stage('Cleanup') {
       steps {
-        // Matar procesos Node.js que puedan estar bloqueando la DB
-        bat 'taskkill /F /IM node.exe /T || exit 0'
-        bat 'timeout /t 2 /nobreak'
+        bat '''
+        taskkill /F /IM node.exe /T 2>nul || echo No hay procesos Node.js corriendo
+        ping 127.0.0.1 -n 3 > nul
+        '''
       }
     }
 
@@ -47,7 +48,6 @@ pipeline {
 
     stage('Archive DB (optional)') {
       steps {
-        // Sintaxis correcta para Windows
         bat '''
         if exist db\\users.db (
           if not exist reports\\db mkdir reports\\db
@@ -73,8 +73,7 @@ pipeline {
       echo 'Pipeline failed — check logs'
     }
     always {
-      // Limpieza final
-      bat 'taskkill /F /IM node.exe /T || exit 0'
+      bat 'taskkill /F /IM node.exe /T 2>nul || echo Limpieza completada'
     }
   }
 }
