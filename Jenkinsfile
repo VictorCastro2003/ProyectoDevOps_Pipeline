@@ -1,7 +1,5 @@
 pipeline {
   agent any
-
-  // ✅ ESTO ES LO QUE FALTABA - Habilita el trigger automático
   triggers {
     githubPush()
   }
