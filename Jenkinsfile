@@ -2,6 +2,14 @@ pipeline {
   agent any
 
   stages {
+    stage('Cleanup') {
+      steps {
+        // Matar procesos Node.js que puedan estar bloqueando la DB
+        bat 'taskkill /F /IM node.exe /T || exit 0'
+        bat 'timeout /t 2 /nobreak'
+      }
+    }
+
     stage('Checkout') {
       steps {
         checkout scm
@@ -25,8 +33,8 @@ pipeline {
       }
     }
 
-   stage('Lint (ESLint)') {
-    steps {
+    stage('Lint (ESLint)') {
+      steps {
         bat '''
         if not exist reports mkdir reports
         echo Ejecutando ESLint...
@@ -34,14 +42,19 @@ pipeline {
         exit /b 0
         '''
         archiveArtifacts artifacts: 'reports\\eslint.log', fingerprint: true
+      }
     }
-}
 
     stage('Archive DB (optional)') {
       steps {
-        // Archive the sqlite DB so evaluator can see it (only for demo)
-        bat 'if [ -f db/users.db ]; then mkdir -p reports/db && cp db/users.db reports/db/; fi'
-        archiveArtifacts artifacts: 'reports/db/**', fingerprint: true
+        // Sintaxis correcta para Windows
+        bat '''
+        if exist db\\users.db (
+          if not exist reports\\db mkdir reports\\db
+          copy db\\users.db reports\\db\\
+        )
+        '''
+        archiveArtifacts artifacts: 'reports/db/**', allowEmptyArchive: true, fingerprint: true
       }
     }
 
@@ -58,6 +71,10 @@ pipeline {
     }
     failure {
       echo 'Pipeline failed — check logs'
+    }
+    always {
+      // Limpieza final
+      bat 'taskkill /F /IM node.exe /T || exit 0'
     }
   }
 }
