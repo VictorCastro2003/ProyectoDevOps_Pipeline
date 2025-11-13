@@ -17,8 +17,21 @@ app.get("/register", (req, res) =>
   res.sendFile(path.join(__dirname, "views", "register.html"))
 );
 
+// Función para cerrar la conexión de la base de datos
+app.closeDatabase = () => {
+  if (db && db.close) {
+    return new Promise((resolve, reject) => {
+      db.close((err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  }
+  return Promise.resolve();
+};
+
 if (require.main === module) {
   app.listen(3000, () => console.log("Servidor en http://localhost:3000"));
 }
 
-module.exports = app; 
+module.exports = app;
