@@ -4,7 +4,22 @@ const fs = require("fs");
 const dbFile = path.join(__dirname, "..", "db", "users.db");
 
 beforeAll(() => {
-  if (fs.existsSync(dbFile)) fs.unlinkSync(dbFile);
+  try {
+    // Si el archivo existe y no está bloqueado, lo borramos
+    if (fs.existsSync(dbFile)) {
+      try {
+        fs.unlinkSync(dbFile);
+      } catch (err) {
+        // Si está bloqueado, lo renombramos (Windows no permite borrar si está en uso)
+        const backupFile = dbFile + ".bak";
+        if (fs.existsSync(backupFile)) fs.unlinkSync(backupFile);
+        fs.renameSync(dbFile, backupFile);
+        console.warn("⚠️ users.db estaba bloqueado, se renombró temporalmente");
+      }
+    }
+  } catch (e) {
+    console.warn("⚠️ No se pudo preparar DB antes del test:", e.message);
+  }
 });
 
 const app = require("../index");
