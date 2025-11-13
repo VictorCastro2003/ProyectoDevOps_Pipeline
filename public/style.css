@@ -1,0 +1,4 @@
+body{font-family:Arial;text-align:center;padding:40px;background:#f4f6f8}
+form{display:inline-block;padding:20px;background:white;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+input{display:block;margin:10px auto;padding:8px;width:200px}
+button{padding:8px 16px;background:#2563eb;color:white;border:none;border-radius:5px}
