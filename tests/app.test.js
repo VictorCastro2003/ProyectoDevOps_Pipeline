@@ -11,7 +11,7 @@ beforeAll(async () => {
     if (fs.existsSync(dbFile)) {
       try {
         fs.unlinkSync(dbFile);
-        console.log("✓ Base de datos limpiada");
+        console.log("BD limpiada");
       } catch (err) {
         const backupFile = dbFile + ".bak";
         if (fs.existsSync(backupFile)) {
@@ -40,7 +40,7 @@ afterAll(async () => {
   try {
     if (app && app.closeDatabase) {
       await app.closeDatabase();
-      console.log("✓ Base de datos cerrada");
+      console.log("BD cerrada");
     }
 
    
