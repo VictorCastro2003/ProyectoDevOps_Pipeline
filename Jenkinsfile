@@ -25,12 +25,17 @@ pipeline {
       }
     }
 
-    stage('Lint (ESLint)') {
-      steps {
-        bat 'mkdir -p reports || true; npm run lint > reports/eslint.log || true'
-        archiveArtifacts artifacts: 'reports/eslint.log', fingerprint: true
-      }
+   stage('Lint (ESLint)') {
+    steps {
+        bat '''
+        if not exist reports mkdir reports
+        echo Ejecutando ESLint...
+        call npm run lint > reports\\eslint.log
+        exit /b 0
+        '''
+        archiveArtifacts artifacts: 'reports\\eslint.log', fingerprint: true
     }
+}
 
     stage('Archive DB (optional)') {
       steps {
