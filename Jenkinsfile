@@ -38,11 +38,9 @@ pipeline {
       steps {
         bat '''
         if not exist reports mkdir reports
-        echo Ejecutando ESLint...
-        call npm run lint > reports\\eslint.log
-        exit /b 0
+        call npm run lint > reports\\eslint.log 2>&1 || echo ESLint completado con warnings
         '''
-        archiveArtifacts artifacts: 'reports\\eslint.log', fingerprint: true
+        archiveArtifacts artifacts: 'reports\\eslint.log', fingerprint: true, allowEmptyArchive: true
       }
     }
 
@@ -52,6 +50,8 @@ pipeline {
         if exist db\\users.db (
           if not exist reports\\db mkdir reports\\db
           copy db\\users.db reports\\db\\
+        ) else (
+          echo No se encontro base de datos
         )
         '''
         archiveArtifacts artifacts: 'reports/db/**', allowEmptyArchive: true, fingerprint: true
@@ -60,20 +60,22 @@ pipeline {
 
     stage('Finish') {
       steps {
-        echo "Pipeline finished (success/failure shown by Jenkins)"
+        echo "Pipeline finished successfully!"
       }
     }
   }
 
   post {
+    always {
+      script {
+        bat 'taskkill /F /IM node.exe /T 2>nul || exit /b 0'
+      }
+    }
     success {
-      echo 'Pipeline completed successfully'
+      echo 'Pipeline completed successfully ✓'
     }
     failure {
       echo 'Pipeline failed — check logs'
-    }
-    always {
-      bat 'taskkill /F /IM node.exe /T 2>nul || echo Limpieza completada'
     }
   }
 }
